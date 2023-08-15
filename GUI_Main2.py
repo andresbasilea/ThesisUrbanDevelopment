@@ -24,13 +24,10 @@ class App(customtkinter.CTk):
         self.sidebar_frame = customtkinter.CTkFrame(self, width=100, corner_radius=0)
         self.sidebar_frame.grid(row=0, column=0, rowspan=4, sticky="nsw")
         self.sidebar_frame.grid_rowconfigure(4, weight=1)
-        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Thesis Project: Ilana Villanueva Carrión", font=customtkinter.CTkFont(size=10, weight="bold"))
+        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Thesis Project:", font=customtkinter.CTkFont(size=14, weight="bold"))
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        
-        # ADD LOGO IMAGE *
-        # button_image = customtkinter.CTkImage(Image.open("images/urbandevelopment.png"), size=(100, 50))
-        # image_button = customtkinter.CTkLabel(self,image=button_image, text="")
-        # image_button.grid(row=0, column=0)
+        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Ilana Villanueva Carrión", font=customtkinter.CTkFont(size=14, weight="bold"))
+        self.logo_label.grid(row=0, column=0, padx=20, pady=(70, 10))
         
         self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, text='Run', command=self.sidebar_button_event)
         self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
@@ -50,19 +47,96 @@ class App(customtkinter.CTk):
         self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
 
 
+        # create tabview frame
+        self.tabview = customtkinter.CTkTabview(self, width=250)
+        self.tabview.grid(row=0, column=1, columnspan=3, rowspan=3,padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.tabview.add("Cell %")
+        self.tabview.add("Parameters")
+        self.tabview.add("Weights")
+        
+        # tabview cell % tab
+        self.tabview.tab("Cell %").grid_columnconfigure((0,1,2,3,4,5,6), weight=1)  # configure grid of individual tabs
+        self.cell_perc_initial_label = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text="Initial Cells", anchor="w", font=customtkinter.CTkFont(size=12, weight="bold"))
+        self.cell_perc_initial_label.grid(row=0, column=0, columnspan=2)
+        self.cell_perc_end_label = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text="End Cells", anchor="e", font=customtkinter.CTkFont(size=12, weight="bold"))
+        self.cell_perc_end_label.grid(row=0, column=4, columnspan=2)
+        self.land_categories = ['Industrial', 'Commercial', 'Residential', 'Green', 'Vacant']
+        self.cell_perc_initial_value = [20,20,20,20,20]
+        self.cell_perc_end_value = [ 20,20,20,20,20]
+        for row in range(1,6):
+            label = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.land_categories[row-1], fg_color="transparent")
+            label.grid(row=row, column=0)
+            label = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.cell_perc_initial_value[row-1], fg_color="transparent")
+            label.grid(row=row, column=1)
+
+        for row in range(1,6):
+            label = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.land_categories[row-1], fg_color="transparent")
+            label.grid(row=row, column=4)
+            label = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.cell_perc_end_value[row-1], fg_color="transparent")
+            label.grid(row=row, column=5)
+
+        # tabview cell % tab
+        self.tabview.tab("Parameters").grid_columnconfigure(0, weight=1)
+        self.tabview.tab("Parameters").grid_rowconfigure((0,1,2,3,4,5), weight=1)
+
+        self.slider_interactions = customtkinter.CTkSlider(self.tabview.tab("Parameters"), from_=0, to=40, number_of_steps=40)
+        self.slider_interactions.grid(row=1, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
+        self.slider_interactions_value = str(int(self.slider_interactions.get()))
+        interactions_parameter = customtkinter.CTkLabel(self.tabview.tab("Parameters"), text="Number of Interactions " + self.slider_interactions_value , fg_color="transparent")
+        interactions_parameter.grid(row=0, column=0)
+
+        self.slider_perturbation = customtkinter.CTkSlider(self.tabview.tab("Parameters"), from_=0, to=1, number_of_steps=50)
+        self.slider_perturbation.grid(row=3, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
+        self.slider_perturbation_value = str(self.slider_perturbation.get())
+        perturbation_parameter = customtkinter.CTkLabel(self.tabview.tab("Parameters"), text="Perturbation " + self.slider_perturbation_value, fg_color="transparent")
+        perturbation_parameter.grid(row=2, column=0)
+
+        self.slider_radius = customtkinter.CTkSlider(self.tabview.tab("Parameters"), from_=1, to=10, number_of_steps=10)
+        self.slider_radius.grid(row=5, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
+        self.slider_radius_value = str(int(self.slider_radius.get()))
+        radius_parameter = customtkinter.CTkLabel(self.tabview.tab("Parameters"), text="Moore Neighborhood (Radius) " + self.slider_radius_value, fg_color="transparent")
+        radius_parameter.grid(row=4, column=0)
+
+
+
+
+
+
+
+        self.tabview.tab("Weights").grid_columnconfigure(0, weight=1)
+
+        # self.optionmenu_1 = customtkinter.CTkOptionMenu(self.tabview.tab("Cell %"), dynamic_resizing=False,
+        #                                                 values=["Value 1", "Value 2", "Value Long Long Long"])
+        # self.optionmenu_1.grid(row=0, column=0, padx=20, pady=(20, 10))
+        
+        # self.combobox_1 = customtkinter.CTkComboBox(self.tabview.tab("CTkTabview"),
+        #                                             values=["Value 1", "Value 2", "Value Long....."])
+        # self.combobox_1.grid(row=1, column=0, padx=20, pady=(10, 10))
+        # self.string_input_button = customtkinter.CTkButton(self.tabview.tab("CTkTabview"), text="Open CTkInputDialog",
+        #                                                    command=self.open_input_dialog_event)
+        # self.string_input_button.grid(row=2, column=0, padx=20, pady=(10, 10))
+        # self.label_tab_2 = customtkinter.CTkLabel(self.tabview.tab("Tab 2"), text="CTkLabel on Tab 2")
+        # self.label_tab_2.grid(row=0, column=0, padx=20, pady=20)
+
 
         # configure canvas for raster creation or upload
-        self.matrix_size = 200
+        self.matrix_size = 100
         self.canvas = tkinter.Canvas(self, width=600, height=600, bg='white')
-        self.canvas.grid(row=0, column=5)
+        self.canvas.grid(row=0, column=5, rowspan=3)
         self.colors = ["#2C3333", "#1D267D", "#5C469C", "#0E8388", "#CBE4DE"]
         self.selected_color = self.colors[0]
+        self.draw_options_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color='transparent')
+        self.draw_options_frame.grid(row=3, column=5)
         self.create_grid()
         self.create_color_buttons()
         self.canvas.bind("<Button-1>", self.start_coloring)
         self.canvas.bind("<B1-Motion>", self.color_cell)
         self.canvas.bind("<ButtonRelease-1>", self.stop_coloring)
         self.is_coloring = False
+        self.slider_size_draw = 1
+
+        self.slider_size_draw = customtkinter.CTkSlider(self.draw_options_frame, from_=1, to=5, number_of_steps=5)
+        self.slider_size_draw.grid(row=3, column=5, columnspan=5, padx=(20, 10), pady=(10, 10), sticky="ew")
 
 
     def create_grid(self):
@@ -78,17 +152,14 @@ class App(customtkinter.CTk):
     def create_color_buttons(self):
         # button_frame = tkinter.Frame(self)
         # button_frame.grid(column=1, row=3)
-        draw_options_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color='transparent')
-        draw_options_frame.grid(row=3, column=5)
-
-        slider_size_draw = customtkinter.CTkSlider(draw_options_frame, from_=0, to=1, number_of_steps=10)
-        slider_size_draw.grid(row=3, column=5, padx=(20, 10), pady=(10, 10), sticky="ew")
+        # draw_options_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color='transparent')
+        # draw_options_frame.grid(row=3, column=5)
 
         i=0
         for color in self.colors:
-            i+=50
-            color_button = tkinter.Button(draw_options_frame, bg=color,  width=2, command=lambda c=color: self.select_color(c))
-            color_button.grid(row=4, column=5, padx=10+i)
+            i+=1
+            color_button = tkinter.Button(self.draw_options_frame, bg=color,  width=2, command=lambda c=color: self.select_color(c))
+            color_button.grid(row=4, column=4+i)
 
     def select_color(self, color):
         self.selected_color = color
@@ -99,7 +170,7 @@ class App(customtkinter.CTk):
 
     def color_cell(self, event):
         if self.is_coloring:
-            cell_size = int(self.canvas['width']) // self.matrix_size
+            cell_size = int(int(self.canvas['width']) * self.slider_size_draw.get() )// self.matrix_size
             col = event.x // cell_size
             row = event.y // cell_size
             x1 = col * cell_size
