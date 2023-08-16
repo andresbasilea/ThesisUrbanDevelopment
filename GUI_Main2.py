@@ -16,7 +16,7 @@ class App(customtkinter.CTk):
 
 		# configure window
 		self.title("Tesis Ila")
-		self.geometry(f"{1300}x{700}")
+		self.geometry(f"{1600}x{700}")
 
 		# configure grid layout (4x4)
 		self.grid_columnconfigure(0, weight=1)
@@ -132,8 +132,8 @@ class App(customtkinter.CTk):
 		self.canvas = tkinter.Canvas(self, width=600, height=600, bg='white')
 		self.canvas.grid(row=0, column=5, rowspan=3)
 		#self.colors = ["#2C3333", "#1D267D", "#5C469C", "#0E8388", "#CBE4DE"]
-		self.colors = ['yellow', 'red', 'blue', 'green','black']
-		self.colors_mapping = {'white':0,'yellow':1, 'red':2, 'blue':3,'green':4,'black':5}
+		self.colors = ['rebeccapurple', 'crimson', 'darkorange', 'darkcyan','black']
+		self.colors_mapping = {'white':0,'rebeccapurple':1, 'crimson':2, 'darkorange':3,'darkcyan':4,'black':5}
 		self.selected_color = self.colors[0]
 		self.draw_options_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color='transparent')
 		self.draw_options_frame.grid(row=3, column=5)
