@@ -137,6 +137,47 @@ class App(customtkinter.CTk):
 
 
         self.tabview.tab("Weights").grid_columnconfigure(0, weight=1)
+        self.root = self.tabview.tab("Weights")
+        self.rows = 20
+        self.columns = 19
+        self.column_headings = [
+            "1", "1.4", "2", "2.2", "2.8", "3", "3.2", "3.6", "4", "4.1", 
+            "4.2", "4.5", "5", "5.1", "5.4", "5.7", "5.8", "6.0", "6.1-8"
+        ]
+        self.row_headings = [
+            "V-C", "V-I", "V-R", "V-G", "I-C", "I-I", "I-R", "I-G", 
+            "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
+            "A-C", "A-I", "A-R", "A-A"
+        ]
+        self.table_data = np.zeros((self.rows, self.columns), dtype=float)
+
+        self.table_frame = customtkinter.CTkFrame(self.root)
+        self.entry_widgets = []
+
+        for i, row_heading in enumerate(self.row_headings):
+            row_label = tkinter.Label(self.table_frame, text=row_heading, width=3, anchor="w") # faster to load with tkinter than customtkinter
+            row_label.grid(row=i+2, column=0)
+            
+            row_entries = []
+            for j, col_heading in enumerate(self.column_headings):
+                if i == 0:  # Add column headings to the first row
+                    col_label = tkinter.Label(self.table_frame, text=col_heading, width=3) # faster to load with tkinter than customtkinter
+                    col_label.grid(row=1, column=j+1)
+                
+                entry = tkinter.Entry(self.table_frame, width=2)  # faster to load with tkinter than customtkinter
+                entry.grid(row=i+2, column=j+1)
+                row_entries.append(entry)
+            self.entry_widgets.append(row_entries)
+
+        self.save_button = customtkinter.CTkButton(self.root, text="Save", command=self.save_table_data)
+        self.save_button.grid(row=50, column=0)
+
+        self.table_frame.grid()
+
+
+
+
+
 
 
 
@@ -300,6 +341,19 @@ class App(customtkinter.CTk):
                 y_pos = int(y1/canvas_matrix_size)
                 self.matrix_array[x_pos][y_pos] = color
                 self.canvas.create_rectangle(x1,y1,x2,y2, fill=list(self.colors_mapping.keys())[list(self.colors_mapping.values()).index(color)], outline='black')
+
+
+    def save_table_data(self):
+        for i in range(self.rows):
+            for j in range(self.columns):
+                entry = self.entry_widgets[i][j]
+                value = entry.get()
+                try:
+                    self.table_data[i, j] = float(value)
+                except ValueError:
+                    pass
+
+        print("Saved data to NumPy array:\n", self.table_data)
 
 
     def run_simulation(self):
