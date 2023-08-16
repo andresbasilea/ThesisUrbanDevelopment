@@ -6,6 +6,7 @@ import numpy as np
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from datetime import datetime
 from random import randint
+from CA_Utils import CA_Utils
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -42,7 +43,7 @@ class App(customtkinter.CTk):
         self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Ilana Villanueva Carrión", font=customtkinter.CTkFont(size=14, weight="bold"))
         self.logo_label.grid(row=0, column=0, padx=20, pady=(70, 10))
         
-        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, text='Run')
+        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, text='Run', command=self.run_simulation)
         self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
         self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, text='Save', command=self.save_matrix_array)
         self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
@@ -299,6 +300,22 @@ class App(customtkinter.CTk):
                 y_pos = int(y1/canvas_matrix_size)
                 self.matrix_array[x_pos][y_pos] = color
                 self.canvas.create_rectangle(x1,y1,x2,y2, fill=list(self.colors_mapping.keys())[list(self.colors_mapping.values()).index(color)], outline='black')
+
+
+    def run_simulation(self):
+        utils = CA_Utils()
+        ##for _ in range(int(self.slider_interactions_value)):
+        self.matrix_array = utils.update_array(self.matrix_array)
+        for x in range(self.matrix_size):
+            for y in range(self.matrix_size):
+                #print(x,y,x+self.cell_size,y+self.cell_size)
+                x1 = x*self.cell_size
+                y1 = y*self.cell_size
+                x2 = x1 + self.cell_size
+                y2 = y1 + self.cell_size
+                self.canvas.create_rectangle(x1,y1,x2,y2, fill=list(self.colors_mapping.keys())[list(self.colors_mapping.values()).index(int(self.matrix_array[x][y]))], outline='black')
+        self.update_percentage_values()
+
 
 
 
