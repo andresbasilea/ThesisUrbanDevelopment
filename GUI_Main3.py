@@ -206,12 +206,15 @@ class App(customtkinter.CTk):
         self.canvas.bind("<Button-3>", self.start_drawing)
         self.canvas.bind("<B3-Motion>", self.draw_polygon)
         self.canvas.bind("<Button-2>", self.stop_drawing) 
-        self.current_polygon = None
+        self.current_polygon = []
         self.is_drawing = False
         self.list_of_polygon_points = []
+        self.pixels_inside = None
 
         self.clear_draw_button = customtkinter.CTkButton(self.draw_options_frame, text='Clear', command=self.create_grid)
         self.clear_draw_button.grid(row=7, column=5, columnspan=5, padx=20, pady=10)
+        self.undo_draw_button = customtkinter.CTkButton(self.draw_options_frame, text='Undo', command=self.undo_polygon)
+        self.undo_draw_button.grid(row=7, column=0, padx=110, pady=10)
         
 
         #self.slider_size_draw = 1
@@ -288,10 +291,10 @@ class App(customtkinter.CTk):
             self.list_of_polygon_points.append(x)
             self.list_of_polygon_points.append(y)
             #print("x: ",y,"y: ",y)
-            self.current_polygon = self.canvas.create_oval(
-                [x,y,x+3,y+3],
+            self.current_polygon.append(self.canvas.create_oval(
+                [x-2,y-2,x+2,y+2],
                 outline=self.selected_color, fill=self.selected_color, width=2
-            )
+            ))
 
             #print(self.current_polygon)
             #self.current_polygon.pack()
@@ -303,34 +306,47 @@ class App(customtkinter.CTk):
             self.is_drawing = False
             self.fill_cells_under_polygon()
             self.canvas.delete(self.current_polygon)
+            self.current_polygon.clear()
             self.list_of_polygon_points.clear()
+        self.is_drawing = False
+        print(self.is_drawing)
 
     def fill_cells_under_polygon(self):
-        #polygon_coords = self.canvas.coords(self.list_of_polygon_points)
-        #print(self.list_of_polygon_points)
-        #print(polygon_coords)
-        # min_x = min(polygon_coords[0::2])
-        # max_x = max(polygon_coords[0::2])
-        # min_y = min(polygon_coords[1::2])
-        # max_y = max(polygon_coords[1::2])
+        self.pixels_inside = self.get_pixels_inside_polygon(self.list_of_polygon_points, self.matrix_size,self.matrix_size)
 
-        self.canvas.create_polygon(
-                [self.list_of_polygon_points],
-                outline=self.selected_color, fill=self.selected_color, width=2
-            )
-
-        pixels_inside = self.get_pixels_inside_polygon(self.list_of_polygon_points, self.matrix_size,self.matrix_size)
-
-        for (x,y) in pixels_inside:
-            x1 = x * self.cell_size
-            y1 = y * self.cell_size
+        for (x,y) in self.pixels_inside:
+            self.cell_size = int(int(self.canvas['width']))// self.matrix_size
+            col = x // self.cell_size
+            row = y // self.cell_size
+            x1 = col * self.cell_size
+            y1 = row * self.cell_size
             x2 = x1 + self.cell_size
             y2 = y1 + self.cell_size
+
+            canvas_matrix_size = self.canvas_width/self.matrix_size
+            x_pos = int(x1/canvas_matrix_size)
+            y_pos = int(y1/canvas_matrix_size)
+            self.matrix_array[x_pos][y_pos] = self.colors_mapping[self.selected_color]
             self.canvas.create_rectangle(x1, y1, x2, y2, fill=self.selected_color, outline='black')
 
+    def undo_polygon(self):
+        for (x,y) in self.pixels_inside:
+            self.cell_size = int(int(self.canvas['width']))// self.matrix_size
+            col = x // self.cell_size
+            row = y // self.cell_size
+            x1 = col * self.cell_size
+            y1 = row * self.cell_size
+            x2 = x1 + self.cell_size
+            y2 = y1 + self.cell_size
+
+            canvas_matrix_size = self.canvas_width/self.matrix_size
+            x_pos = int(x1/canvas_matrix_size)
+            y_pos = int(y1/canvas_matrix_size)
+            self.matrix_array[x_pos][y_pos] = self.colors_mapping['white']
+            self.canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
+        self.update_percentage_values()
 
     def is_point_inside_polygon(self,x, y, polygon_coords):
-        # Check if the point (x, y) is inside the polygon defined by polygon_coords.
         n = len(polygon_coords)
         inside = False
         p1x, p1y = polygon_coords[0], polygon_coords[1]
@@ -347,9 +363,8 @@ class App(customtkinter.CTk):
         return inside
 
     def get_pixels_inside_polygon(self,polygon_item, canvas_width, canvas_height):
-        # Get all the pixels (x, y) that are inside the specified polygon on the canvas.
         polygon_coords = polygon_item
-        print(polygon_coords)
+        #print(polygon_coords)
         min_x, max_x = min(polygon_coords[::2]), max(polygon_coords[::2])
         min_y, max_y = min(polygon_coords[1::2]), max(polygon_coords[1::2])
 
@@ -360,13 +375,6 @@ class App(customtkinter.CTk):
                     pixels_inside.append((x, y))
 
         return pixels_inside
-
-
-
-
-
-
-
 
 
 
@@ -424,11 +432,12 @@ class App(customtkinter.CTk):
         self.radius_parameter.configure(text = "Moore Neighborhood (Radius): " + str(int(value)))
 
     def change_grid_size(self, value):
+        #self.cell_size = int(self.canvas['width']) // self.matrix_size
         self.grid_size_label.configure(text = "Grid Size: " + value)
         self.matrix_size = int(value)
         self.total_number_cells = self.matrix_size*self.matrix_size
         self.canvas.destroy()
-        # configure canvas for raster creation or upload
+        
         self.canvas_width = 600 + int(value)
         self.canvas = tkinter.Canvas(self, width=self.canvas_width, height=self.canvas_width, bg='white')
         self.canvas.grid(row=0, column=5, rowspan=3)
@@ -437,6 +446,15 @@ class App(customtkinter.CTk):
         self.canvas.bind("<B1-Motion>", self.color_cell)
         self.canvas.bind("<ButtonRelease-1>", self.stop_coloring)
         self.is_coloring = False
+
+        #Polygon creator initial states
+        self.canvas.bind("<Button-3>", self.start_drawing)
+        self.canvas.bind("<B3-Motion>", self.draw_polygon)
+        self.canvas.bind("<Button-2>", self.stop_drawing) 
+        self.current_polygon = []
+        self.is_drawing = False
+        self.list_of_polygon_points = []
+
         self.create_grid()
 
     def random_fill(self):
