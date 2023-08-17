@@ -7,6 +7,7 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename
 from datetime import datetime
 from random import randint
 from CA_Utils import CA_Utils
+from pathlib import Path
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -132,14 +133,11 @@ class App(customtkinter.CTk):
 
 
 
-
-
-
-
+        # WEIGHTS
         self.tabview.tab("Weights").grid_columnconfigure(0, weight=1)
         self.root = self.tabview.tab("Weights")
-        self.rows = 20
-        self.columns = 19
+        self.table_rows = 20
+        self.table_columns = 19
         self.column_headings = [
             "1", "1.4", "2", "2.2", "2.8", "3", "3.2", "3.6", "4", "4.1", 
             "4.2", "4.5", "5", "5.1", "5.4", "5.7", "5.8", "6.0", "6.1-8"
@@ -149,22 +147,28 @@ class App(customtkinter.CTk):
             "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
             "A-C", "A-I", "A-R", "A-A"
         ]
-        self.table_data = np.zeros((self.rows, self.columns), dtype=float)
+
+        self.table_data = np.zeros((self.table_rows, self.table_columns), dtype=int)
+
+        my_file = Path("table_data.npy")
+        if my_file.is_file():
+            self.table_data = np.load("table_data.npy")
 
         self.table_frame = customtkinter.CTkFrame(self.root)
         self.entry_widgets = []
 
         for i, row_heading in enumerate(self.row_headings):
-            row_label = tkinter.Label(self.table_frame, text=row_heading, width=3, anchor="w") # faster to load with tkinter than customtkinter
+            row_label = customtkinter.CTkLabel(self.table_frame, text=row_heading, width=3, anchor="w") # faster to load with tkinter than customtkinter
             row_label.grid(row=i+2, column=0)
             
             row_entries = []
             for j, col_heading in enumerate(self.column_headings):
                 if i == 0:  # Add column headings to the first row
-                    col_label = tkinter.Label(self.table_frame, text=col_heading, width=3) # faster to load with tkinter than customtkinter
+                    col_label = customtkinter.CTkLabel(self.table_frame, text=col_heading, width=3) # faster to load with tkinter than customtkinter
                     col_label.grid(row=1, column=j+1)
                 
                 entry = tkinter.Entry(self.table_frame, width=2)  # faster to load with tkinter than customtkinter
+                entry.insert(-1, self.table_data[i,j])
                 entry.grid(row=i+2, column=j+1)
                 row_entries.append(entry)
             self.entry_widgets.append(row_entries)
@@ -197,6 +201,15 @@ class App(customtkinter.CTk):
         self.canvas.bind("<B1-Motion>", self.color_cell)
         self.canvas.bind("<ButtonRelease-1>", self.stop_coloring)
         self.is_coloring = False
+        
+        # Polygon
+        self.canvas.bind("<Button-3>", self.start_drawing)
+        self.canvas.bind("<B3-Motion>", self.draw_polygon)
+        self.canvas.bind("<Button-2>", self.stop_drawing) 
+        self.current_polygon = None
+        self.is_drawing = False
+        self.list_of_polygon_points = []
+
         self.clear_draw_button = customtkinter.CTkButton(self.draw_options_frame, text='Clear', command=self.create_grid)
         self.clear_draw_button.grid(row=7, column=5, columnspan=5, padx=20, pady=10)
         
@@ -253,12 +266,111 @@ class App(customtkinter.CTk):
             # Transpose
             self.canvas.create_rectangle(x1, y1, x2, y2, fill=self.selected_color, outline='black')
 
-            
-            
 
     def stop_coloring(self, event):
         self.is_coloring = False
     
+
+
+    # Polygon draw
+    def start_drawing(self, event):
+        print('drawing true')
+        self.is_drawing = True
+        self.draw_polygon(event)
+        
+        #self.current_polygon = [event.x, event.y]
+        #self.list_of_polygon_points.append(self.current_polygon[0], self.current_polygon[1])
+        
+
+    def draw_polygon(self, event):
+        if self.is_drawing:
+            x, y = event.x, event.y
+            self.list_of_polygon_points.append(x)
+            self.list_of_polygon_points.append(y)
+            #print("x: ",y,"y: ",y)
+            self.current_polygon = self.canvas.create_oval(
+                [x,y,x+3,y+3],
+                outline=self.selected_color, fill=self.selected_color, width=2
+            )
+
+            #print(self.current_polygon)
+            #self.current_polygon.pack()
+
+
+    def stop_drawing(self, event):
+        print("stop drawing")
+        if self.is_drawing:
+            self.is_drawing = False
+            self.fill_cells_under_polygon()
+            self.canvas.delete(self.current_polygon)
+            self.list_of_polygon_points.clear()
+
+    def fill_cells_under_polygon(self):
+        #polygon_coords = self.canvas.coords(self.list_of_polygon_points)
+        #print(self.list_of_polygon_points)
+        #print(polygon_coords)
+        # min_x = min(polygon_coords[0::2])
+        # max_x = max(polygon_coords[0::2])
+        # min_y = min(polygon_coords[1::2])
+        # max_y = max(polygon_coords[1::2])
+
+        self.canvas.create_polygon(
+                [self.list_of_polygon_points],
+                outline=self.selected_color, fill=self.selected_color, width=2
+            )
+
+        pixels_inside = self.get_pixels_inside_polygon(self.list_of_polygon_points, self.matrix_size,self.matrix_size)
+
+        for (x,y) in pixels_inside:
+            x1 = x * self.cell_size
+            y1 = y * self.cell_size
+            x2 = x1 + self.cell_size
+            y2 = y1 + self.cell_size
+            self.canvas.create_rectangle(x1, y1, x2, y2, fill=self.selected_color, outline='black')
+
+
+    def is_point_inside_polygon(self,x, y, polygon_coords):
+        # Check if the point (x, y) is inside the polygon defined by polygon_coords.
+        n = len(polygon_coords)
+        inside = False
+        p1x, p1y = polygon_coords[0], polygon_coords[1]
+        for i in range(0, n + 2, 2):
+            p2x, p2y = polygon_coords[i % n], polygon_coords[(i + 1) % n]
+            if y > min(p1y, p2y):
+                if y <= max(p1y, p2y):
+                    if x <= max(p1x, p2x):
+                        if p1y != p2y:
+                            x_intersection = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                            if p1x == p2x or x <= x_intersection:
+                                inside = not inside
+            p1x, p1y = p2x, p2y
+        return inside
+
+    def get_pixels_inside_polygon(self,polygon_item, canvas_width, canvas_height):
+        # Get all the pixels (x, y) that are inside the specified polygon on the canvas.
+        polygon_coords = polygon_item
+        print(polygon_coords)
+        min_x, max_x = min(polygon_coords[::2]), max(polygon_coords[::2])
+        min_y, max_y = min(polygon_coords[1::2]), max(polygon_coords[1::2])
+
+        pixels_inside = []
+        for x in range(int(min_x), int(max_x) + 1):
+            for y in range(int(min_y), int(max_y) + 1):
+                if self.is_point_inside_polygon(x, y, polygon_coords):
+                    pixels_inside.append((x, y))
+
+        return pixels_inside
+
+
+
+
+
+
+
+
+
+
+
     def save_matrix_array(self):
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y--%H:%M:%S")
@@ -344,8 +456,9 @@ class App(customtkinter.CTk):
 
 
     def save_table_data(self):
-        for i in range(self.rows):
-            for j in range(self.columns):
+        self.table_data = np.zeros((self.table_rows, self.table_columns), dtype=int)
+        for i in range(self.table_rows):
+            for j in range(self.table_columns):
                 entry = self.entry_widgets[i][j]
                 value = entry.get()
                 try:
@@ -354,6 +467,11 @@ class App(customtkinter.CTk):
                     pass
 
         print("Saved data to NumPy array:\n", self.table_data)
+
+        with open('table_data.npy','wb') as f:
+            np.save(f, self.table_data)
+
+
 
 
     def run_simulation(self):
