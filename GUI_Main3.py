@@ -8,6 +8,10 @@ from datetime import datetime
 from random import randint
 from CA_Utils import CA_Utils
 from pathlib import Path
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+import pandas as pd
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -33,6 +37,7 @@ class App(customtkinter.CTk):
         self.matrix_array_size = np.empty((self.matrix_size, self.matrix_size))
         self.matrix_array = np.zeros_like(self.matrix_array_size)
         self.total_number_cells = self.matrix_size*self.matrix_size
+        self.weights_matrix = None
 
 
         # create sidebar frame with widgets
@@ -61,6 +66,9 @@ class App(customtkinter.CTk):
         self.random_fill_button = customtkinter.CTkButton(self.sidebar_frame, text='Random Fill', command=self.random_fill)
         self.random_fill_button.grid(row=4, column=0, padx=20,pady=(200, 10))
 
+        self.load_weights_button = customtkinter.CTkButton(self.sidebar_frame, text='Load Weights', command=self.load_weights)
+        self.load_weights_button.grid(row=4, column=0, padx=20,pady=(280, 10))
+
         self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
         self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
         self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"],
@@ -78,7 +86,8 @@ class App(customtkinter.CTk):
         self.tabview.grid(row=0, column=1, columnspan=3, rowspan=3,padx=(20, 0), pady=(20, 0), sticky="nsew")
         self.tabview.add("Cell %")
         self.tabview.add("Parameters")
-        self.tabview.add("Weights")
+        #self.tabview.add("Weights")
+        self.tabview.add("Graphs")
         
         # tabview cell % tab
         self.tabview.tab("Cell %").grid_columnconfigure((0,1,2,3,4,5,6), weight=1)  # configure grid of individual tabs
@@ -89,13 +98,22 @@ class App(customtkinter.CTk):
         self.update_percentage_button = customtkinter.CTkButton(self.tabview.tab("Cell %"), text='Update Percentages', command=self.update_percentage_values)
         self.update_percentage_button.grid(row=8, column=2, columnspan=2, padx=20, pady=10)
         self.land_categories = ['Industrial', 'Commercial', 'Residential', 'Green', 'Vacant']
-        self.ind_initial_val = np.count_nonzero(self.matrix_array==1) / self.total_number_cells
-        self.com_initial_val = np.count_nonzero(self.matrix_array==2) / self.total_number_cells
-        self.res_initial_val = np.count_nonzero(self.matrix_array==3) / self.total_number_cells
-        self.gre_initial_val = np.count_nonzero(self.matrix_array==4) / self.total_number_cells
-        self.vac_initial_val = np.count_nonzero(self.matrix_array==5) / self.total_number_cells
+        self.ind_initial_val = np.count_nonzero(self.matrix_array==1) / self.total_number_cells *100
+        self.com_initial_val = np.count_nonzero(self.matrix_array==2) / self.total_number_cells *100
+        self.res_initial_val = np.count_nonzero(self.matrix_array==3) / self.total_number_cells *100
+        self.gre_initial_val = np.count_nonzero(self.matrix_array==4) / self.total_number_cells *100
+        self.vac_initial_val = np.count_nonzero(self.matrix_array==5) / self.total_number_cells *100
         self.cell_perc_initial_value = [self.ind_initial_val, self.com_initial_val, self.res_initial_val, self.gre_initial_val, self.vac_initial_val]
-        self.cell_perc_end_value = [ 0.0,0.0,0.0,0.0,0.0]
+
+        
+        self.ind_final_val = (np.count_nonzero(self.matrix_array==1) / self.total_number_cells) *100
+        self.com_final_val = (np.count_nonzero(self.matrix_array==2) / self.total_number_cells) *100
+        self.res_final_val = (np.count_nonzero(self.matrix_array==3) / self.total_number_cells) *100
+        self.gre_final_val = (np.count_nonzero(self.matrix_array==4) / self.total_number_cells) *100
+        self.vac_final_val = (np.count_nonzero(self.matrix_array==5) / self.total_number_cells) *100
+        self.cell_perc_final_value = [self.ind_final_val, self.com_final_val, self.res_final_val, self.gre_final_val, self.vac_final_val]
+        self.cell_perc_final_value = [0.0,0.0,0.0,0.0,0.0]
+
         for row in range(1,6):
             label = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.land_categories[row-1], fg_color="transparent")
             label.grid(row=row, column=0)
@@ -103,10 +121,10 @@ class App(customtkinter.CTk):
             label.grid(row=row, column=1)
 
         for row in range(1,6):
-            label = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.land_categories[row-1], fg_color="transparent")
-            label.grid(row=row, column=4)
-            label = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.cell_perc_end_value[row-1], fg_color="transparent")
-            label.grid(row=row, column=5)
+            label_final = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.land_categories[row-1], fg_color="transparent")
+            label_final.grid(row=row, column=4)
+            label_final = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.cell_perc_final_value[row-1], fg_color="transparent")
+            label_final.grid(row=row, column=5)
 
         # tabview parameters tab
         self.tabview.tab("Parameters").grid_columnconfigure(0, weight=1)
@@ -124,9 +142,9 @@ class App(customtkinter.CTk):
         self.perturbation_parameter = customtkinter.CTkLabel(self.tabview.tab("Parameters"), text="Perturbation: " + self.slider_perturbation_value, fg_color="transparent")
         self.perturbation_parameter.grid(row=2, column=0)
 
-        self.slider_radius = customtkinter.CTkSlider(self.tabview.tab("Parameters"), from_=1, to=10, number_of_steps=10, command=self.set_label_parameter_radius)
+        self.slider_radius = customtkinter.CTkSlider(self.tabview.tab("Parameters"), from_=1, to=10, number_of_steps=10, state='disabled', command=self.set_label_parameter_radius)
         self.slider_radius.grid(row=5, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        self.slider_radius.set(8)
+        self.slider_radius.set(6)
         self.slider_radius_value = str(int(self.slider_radius.get()))
         self.radius_parameter = customtkinter.CTkLabel(self.tabview.tab("Parameters"), text="Moore Neighborhood (Radius): " + self.slider_radius_value, fg_color="transparent")
         self.radius_parameter.grid(row=4, column=0)
@@ -134,51 +152,98 @@ class App(customtkinter.CTk):
 
 
         # WEIGHTS
-        self.tabview.tab("Weights").grid_columnconfigure(0, weight=1)
-        self.root = self.tabview.tab("Weights")
-        self.table_rows = 20
-        self.table_columns = 19
-        self.column_headings = [
-            "1", "1.4", "2", "2.2", "2.8", "3", "3.2", "3.6", "4", "4.1", 
-            "4.2", "4.5", "5", "5.1", "5.4", "5.7", "5.8", "6.0", "6.1-8"
-        ]
-        self.row_headings = [
-            "V-C", "V-I", "V-R", "V-G", "I-C", "I-I", "I-R", "I-G", 
-            "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
-            "A-C", "A-I", "A-R", "A-A"
-        ]
 
-        self.table_data = np.zeros((self.table_rows, self.table_columns), dtype=int)
+        #self.weights_file = read_weights.read_excel_weights("pesos.xlsx")
 
-        my_file = Path("table_data.npy")
-        if my_file.is_file():
-            self.table_data = np.load("table_data.npy")
+        # self.tabview.tab("Weights").grid_columnconfigure(0, weight=1)
+        # self.root = self.tabview.tab("Weights")
+        # self.table_rows = 127
+        # self.table_columns = 19
+        # self.column_headings = [ 
+        #     "1", "1.4", "2", "2.2", "2.8", "3", "3.2", "3.6", "4", "4.1", 
+        #     "4.2", "4.5", "5", "5.1", "5.4", "5.7", "5.8", "6.0", "6.1-8"
+        # ]
+        # self.row_headings = [ "A-A",
 
-        self.table_frame = customtkinter.CTkFrame(self.root)
-        self.entry_widgets = []
+        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
+        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
+        #     "A-C", "A-I", "A-R", "A-A",
 
-        for i, row_heading in enumerate(self.row_headings):
-            row_label = customtkinter.CTkLabel(self.table_frame, text=row_heading, width=3, anchor="w") # faster to load with tkinter than customtkinter
-            row_label.grid(row=i+2, column=0)
+        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
+        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
+        #     "A-C", "A-I", "A-R", "A-A",
+
+        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
+        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
+        #     "A-C", "A-I", "A-R", "A-A",
+
+        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
+        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
+        #     "A-C", "A-I", "A-R", "A-A",
+
+        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
+        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
+        #     "A-C", "A-I", "A-R", "A-A",
+
+        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
+        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
+        #     "A-C", "A-I", "A-R", "A-A"
+        # ]
+
+        # self.table_data = np.zeros((self.table_rows, self.table_columns), dtype=int)
+
+        # my_file = Path("weights_file.npy")
+        # if my_file.is_file():
+        #     self.table_data = np.load("weights_file.npy")
+
+        # self.table_frame = customtkinter.CTkScrollableFrame(self.root)
+        # #self.table_frame.grid(column=0, columnspan=30)
+        # self.entry_widgets = []
+
+        # for i, row_heading in enumerate(self.row_headings):
+        #     row_label = customtkinter.CTkLabel(self.table_frame, text=row_heading, width=3, anchor="w") # faster to load with tkinter than customtkinter
+        #     row_label.grid(row=i+2, column=0)
             
-            row_entries = []
-            for j, col_heading in enumerate(self.column_headings):
-                if i == 0:  # Add column headings to the first row
-                    col_label = customtkinter.CTkLabel(self.table_frame, text=col_heading, width=3) # faster to load with tkinter than customtkinter
-                    col_label.grid(row=1, column=j+1)
+        #     row_entries = []
+        #     for j, col_heading in enumerate(self.column_headings):
+        #         if i == 0:  # Add column headings to the first row
+        #             col_label = customtkinter.CTkLabel(self.table_frame, text=col_heading, width=3) # faster to load with tkinter than customtkinter
+        #             col_label.grid(row=1, column=j+1)
                 
-                entry = tkinter.Entry(self.table_frame, width=2)  # faster to load with tkinter than customtkinter
-                entry.insert(-1, self.table_data[i,j])
-                entry.grid(row=i+2, column=j+1)
-                row_entries.append(entry)
-            self.entry_widgets.append(row_entries)
+        #         entry = tkinter.Entry(self.table_frame, width=2)  # faster to load with tkinter than customtkinter
+        #         entry.insert(-1, self.table_data[i,j])
+        #         entry.grid(row=i+2, column=j+1)
+        #         row_entries.append(entry)
+        #     self.entry_widgets.append(row_entries)
 
-        self.save_button = customtkinter.CTkButton(self.root, text="Save", command=self.save_table_data)
-        self.save_button.grid(row=50, column=0)
+        # self.save_button = customtkinter.CTkButton(self.root, text="Save", command=self.save_table_data)
+        # self.save_button.grid(row=50, column=0)
 
-        self.table_frame.grid()
+        # self.table_frame.grid()
 
 
+
+
+
+        # GRAPHS
+
+        self.tabview.tab("Graphs").grid_columnconfigure(0, weight=1)
+        self.figure = Figure(figsize=(6, 4), dpi=100)
+        self.root = self.tabview.tab("Graphs")
+        self.plot = self.figure.add_subplot(111)
+        self.plot.set_xlabel('Time Interval')
+        self.plot.set_ylabel('Percentage of Green Areas')
+        self.plot.set_title('Change in Percentage of Green Areas over Time')
+        self.canvas_graphs = FigureCanvasTkAgg(self.figure, master=self.root)
+        self.canvas_widget = self.canvas_graphs.get_tk_widget()
+        self.canvas_widget.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
+
+        self.update_button = customtkinter.CTkButton(self.root, text="Update Plot", command=self.update_plot)
+        self.update_button.pack(side=tkinter.BOTTOM, pady=10)
+
+        self.time_intervals = [1, 2]
+        self.data_points = [self.gre_initial_val, self.gre_final_val+10]
+        #self.update_plot()
 
 
 
@@ -260,7 +325,7 @@ class App(customtkinter.CTk):
             x2 = x1 + self.cell_size
             y2 = y1 + self.cell_size
 
-            # print(col, row, x1/12, y1/12, x2,y2)
+            #print(col, row, x1/12, y1/12, x2,y2)
             canvas_matrix_size = self.canvas_width/self.matrix_size
             x_pos = int(x1/canvas_matrix_size)
             y_pos = int(y1/canvas_matrix_size)
@@ -277,7 +342,7 @@ class App(customtkinter.CTk):
 
     # Polygon draw
     def start_drawing(self, event):
-        print('drawing true')
+        #print('drawing true')
         self.is_drawing = True
         self.draw_polygon(event)
         
@@ -301,7 +366,7 @@ class App(customtkinter.CTk):
 
 
     def stop_drawing(self, event):
-        print("stop drawing")
+        #print("stop drawing")
         if self.is_drawing:
             self.is_drawing = False
             self.fill_cells_under_polygon()
@@ -309,7 +374,7 @@ class App(customtkinter.CTk):
             self.current_polygon.clear()
             self.list_of_polygon_points.clear()
         self.is_drawing = False
-        print(self.is_drawing)
+        #print(self.is_drawing)
 
     def fill_cells_under_polygon(self):
         self.pixels_inside = self.get_pixels_inside_polygon(self.list_of_polygon_points, self.matrix_size,self.matrix_size)
@@ -379,6 +444,32 @@ class App(customtkinter.CTk):
 
 
 
+        # Graph
+
+    def update_plot(self):
+        # Clear the previous plot and update with new data
+
+        # self.canvas_graphs.destroy()
+        self.canvas_widget.destroy()
+        self.canvas_graphs = FigureCanvasTkAgg(self.figure, master=self.root)
+        self.canvas_widget = self.canvas_graphs.get_tk_widget()
+        self.canvas_widget.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
+
+        self.plot.clear()
+        self.data_points = [self.gre_initial_val, self.gre_final_val]
+        # for i in range(len(self.time_intervals)):
+        #     plt.annotate(self.data_points[i], (self.time_intervals[i], self.data_points[i] + 0.2))
+        self.plot.plot(self.time_intervals, self.data_points, marker='p', color='darkcyan')
+
+
+
+        self.plot.set_xlabel('Time Interval')
+        self.plot.set_ylabel('Percentage of Green Areas')
+        self.plot.set_title('Change in Percentage of Green Areas over Time')
+        #self.canvas.draw()
+
+
+
     def save_matrix_array(self):
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y--%H:%M:%S")
@@ -410,6 +501,8 @@ class App(customtkinter.CTk):
         self.gre_initial_val = (np.count_nonzero(self.matrix_array==4) / self.total_number_cells) *100
         self.vac_initial_val = (np.count_nonzero(self.matrix_array==5) / self.total_number_cells) *100
         self.cell_perc_initial_value = [self.ind_initial_val, self.com_initial_val, self.res_initial_val, self.gre_initial_val, self.vac_initial_val]
+
+
         for row in range(1,6):
             label = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.land_categories[row-1], fg_color="transparent")
             label.grid(row=row, column=0)
@@ -495,17 +588,69 @@ class App(customtkinter.CTk):
     def run_simulation(self):
         utils = CA_Utils()
         ##for _ in range(int(self.slider_interactions_value)):
-        self.matrix_array = utils.update_array(self.matrix_array)
-        for x in range(self.matrix_size):
-            for y in range(self.matrix_size):
-                #print(x,y,x+self.cell_size,y+self.cell_size)
-                x1 = x*self.cell_size
-                y1 = y*self.cell_size
-                x2 = x1 + self.cell_size
-                y2 = y1 + self.cell_size
-                self.canvas.create_rectangle(x1,y1,x2,y2, fill=list(self.colors_mapping.keys())[list(self.colors_mapping.values()).index(int(self.matrix_array[x][y]))], outline='black')
-        self.update_percentage_values()
+        #self.matrix_array = utils.update_array(self.matrix_array)
+        
+        changed_state_matrix = None
 
+        try:
+            if self.weights_matrix.any():
+                changed_state_matrix = utils.white_transition(self.matrix_array, self.weights_matrix)
+                print("\n\n\n##########\n\nchanged_state_matrix: ", changed_state_matrix)
+
+                for x in range(self.matrix_size):
+                    for y in range(self.matrix_size):
+                        #print(x,y,x+self.cell_size,y+self.cell_size)
+                        x1 = x*self.cell_size
+                        y1 = y*self.cell_size
+                        x2 = x1 + self.cell_size
+                        y2 = y1 + self.cell_size
+                        self.canvas.create_rectangle(x1,y1,x2,y2, fill=list(self.colors_mapping.keys())[list(self.colors_mapping.values()).index(int(changed_state_matrix[x][y]))], outline='black')
+                #self.update_percentage_values()
+
+
+                self.ind_final_val = (np.count_nonzero(changed_state_matrix==1) / self.total_number_cells) *100
+                self.com_final_val = (np.count_nonzero(changed_state_matrix==2) / self.total_number_cells) *100
+                self.res_final_val = (np.count_nonzero(changed_state_matrix==3) / self.total_number_cells) *100
+                self.gre_final_val = (np.count_nonzero(changed_state_matrix==4) / self.total_number_cells) *100
+                self.vac_final_val = (np.count_nonzero(changed_state_matrix==5) / self.total_number_cells) *100
+                self.cell_perc_final_value = [self.ind_final_val, self.com_final_val, self.res_final_val, self.gre_final_val, self.vac_final_val]
+
+                for row in range(1,6):
+                    label_final = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.land_categories[row-1], fg_color="transparent")
+                    label_final.grid(row=row, column=4)
+                    label_final = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text= " " + str(self.cell_perc_final_value[row-1])[0:4] + "  ", fg_color="transparent")
+                    label_final.grid(row=row, column=5)
+
+        except Exception as error: print("Error (either missing weights file or something else): ", error)
+
+        
+
+
+
+
+    def load_weights(self):
+
+        filename = askopenfilename()
+        if filename:
+            weights_file = pd.read_excel(filename)
+
+            print(weights_file)
+
+            weights_file = weights_file.dropna()
+            weights_file.drop(columns=weights_file.columns[0], axis=1, inplace=True)
+
+            weights_file_np = weights_file.to_numpy()
+            print(weights_file_np)
+            self.weights_matrix = weights_file_np
+
+
+
+
+
+
+            
+
+        
 
 
 
