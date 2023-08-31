@@ -142,6 +142,16 @@ class CA_Utils:
 
 		for row in range(matrix.shape[0]):
 			for col in range(matrix.shape[1]):
+
+				self.P_XtoC = 0
+				self.P_XtoI = 0
+				self.P_XtoH = 0
+				self.P_XtoG = 0
+				self.sum_XtoC = 0 
+				self.sum_XtoI = 0
+				self.sum_XtoH = 0
+				self.sum_XtoG = 0
+
 				self.central_col = col
 				self.central_row = row
 				self.central_land_use = matrix[row, col]
@@ -151,7 +161,7 @@ class CA_Utils:
 
 
 				if self.central_land_use == 0: # i cell (central cell) is vacant 
-					pass
+					self.weights_range = 94
 				if self.central_land_use == 1: # i cell (central cell) is Industrial 
 					self.weights_range = 0
 				if self.central_land_use == 2: # i cell (central cell) is Commercial
@@ -166,8 +176,10 @@ class CA_Utils:
 				distance_band_num = 0
 				for distance_band in self.list_distance_bands:
 					distance_band_num += 1
+					
+
 					for h in distance_band:
-						print("H: ", h, " distance_band: ", distance_band)
+						#print("H: ", h, " distance_band: ", distance_band)
 						new_row = self.central_row + h[0]
 						new_col = self.central_col + h[1]
 
@@ -177,7 +189,7 @@ class CA_Utils:
 							h_land_use = None
 							print("h_land_use outside of bounds")
 							break 
-						print("new_row: ", new_row, "new_col: ", new_col, "h_land_use: ", h_land_use)
+						#print("new_row: ", new_row, "new_col: ", new_col, "h_land_use: ", h_land_use)
 
 						
 						if h_land_use == 0:
@@ -220,9 +232,11 @@ class CA_Utils:
 				self.P_XtoG = self.stochastic_disturbance * (1 + self.sum_XtoG)
 				self.list_potential_value = [self.P_XtoC, self.P_XtoI, self.P_XtoH, self.P_XtoG]
 
+				print("list_potential_value: ", self.list_potential_value)
 				max_index = self.list_potential_value.index(max(self.list_potential_value))
-				# print("max_index: ", max_index)
+				print("max_index: ", max_index)
 				changed_state_matrix[row][col] = max_index + 1
+				#print(changed_state_matrix)
 
 
 
@@ -232,195 +246,12 @@ class CA_Utils:
 					ADD weight range for vacant
 	
 				"""
-
-
-				# 		for potential in range(len(list_potential_land_use)-1):
-
-				# 			if matrix[new_row, new_col] == 1: 
-				# 				centralLandUsetoSomething = weights[potential+1][distance_band_num]
-				# 			if matrix[new_row, new_col] == 2: 
-				# 				centralLandUsetoSomething = weights[potential+2][distance_band_num]
-				# 			if matrix[new_row, new_col] == 3: 
-				# 				centralLandUsetoSomething = weights[potential+3][distance_band_num]
-				# 			if matrix[new_row, new_col] == 4: 
-				# 				centralLandUsetoSomething = weights[potential+4][distance_band_num]
-				# 			if matrix[new_row, new_col] == 5: 
-				# 				centralLandUsetoSomething = weights[potential+5][distance_band_num]
-
-				# 			potential += 6
-
-
-
-
-
-
-
-
-
-
-				# 		try:
-				# 			if matrix[new_row, new_col] == matrix[self.central_row, self.central_col]:
-				# 				Ihd = 1
-				# 			else: 
-				# 				Ihd = 0
-				# 		except: Ihd = 0
-
-						
-				# 		#sMax = [0, 0]
-						
-				# 		if Ihd == 1:
-				# 			if self.central_land_use == 1: # industrial to something
-				# 				ItoSomething = weights[0+1][distance_band_num] * Ihd
-				# 				print("\n\n############\n\nItoSomething: ",ItoSomething,"\n\n###########\n\n")
-
-				# 				sum_result_ItoSomething = sum_result_ItoSomething + ItoSomething
-				# 				list_potential_value[0] = sum_result_ItoSomething
-
-				# 			if self.central_land_use == 2: # commercial to something
-				# 				CtoSomething = weights[20+1][distance_band_num] * Ihd
-				# 				print("\n\n############\n\nCtoSomething: ",CtoSomething,"\n\n###########\n\n")
-								
-				# 				sum_result_CtoSomething = sum_result_CtoSomething + CtoSomething
-				# 				list_potential_value[1] = sum_result_CtoSomething
-
-				# 			if self.central_land_use == 3: # housing to something
-				# 				pass
-
-				# 			if self.central_land_use == 4: # green to something
-				# 				pass
-
-				# 			if self.central_land_use == 5: # vacant to something
-				# 				pass
-
-				
-				# print("sum_result_ItoSomething: ", sum_result_ItoSomething)
-				# print("sum_result_CtoSomething: ", sum_result_CtoSomething)
-				# max_index = list_potential_value.index(max(list_potential_value))
-				# print("max_index: ", max_index)
-				# changed_state_matrix[row][col] = max_index + 1
-				
+		
 
 		return changed_state_matrix
 
 
-						# for land_use_h in range(0, len(list_potential_land_use)):
-						# 	if self.central_land_use == 1: # industrial to something
-						# 		ItoSomething = weights[land_use_h][distance_band_num] * Ihd
-
-
-						# 		sum_result = sum_result + (matrix_pesos[d][tipo_suelo_queremos][potencial_de_cada_tipo_suelo] * Ihd)
-
-
-
-						# 	if self.central_land_use == 2: # commercial to something
-						# 		pass
-						# 	if self.central_land_use == 3: # housing to something
-						# 		pass
-						# 	if self.central_land_use == 4: # green to something
-						# 		pass
-						# 	if self.central_land_use == 5: # vacant to something
-						# 		pass
-
-
-
 						
-
-
-
-						#sum_result = sum_result + (matrix_pesos[d][tipo_suelo_queremos][potencial_de_cada_tipo_suelo] * Ihd)
-
-						
-
-
-
-						# i = 0
-						# for potential_land_use in list_potential_land_use:
-						# 	i += 1
-						# 	if matrix[new_row, new_col] == tipo_suelo_potencial:
-						# 		Ihd = 1
-						# 	else:
-						# 		Ihd = 0
-
-				# 			for potencial_lista_ila... in range(0,100):
-
-				# 				suma = suma + (matrix_pesos[d][tipo_suelo_queremos][potencial_de_cada_tipo_suelo] * Ihd)
-
-				# 				list_potential_value.insert(i, perturbation * (1 + suma))
-
-				# max_potential = list_potential_value.max_index
-
-				# matrix[col][row] = max_potential
-
-
-	# def white_transition(self, matrix, iterations, number_of_bands):
-
-
-
-	# 	list_potential_land_use = ['Industrial', 'Commercial', 'Residential', 'Green', 'Vacant']
-	# 	Ihd = 1
-	# 	suma = 0
-	# 	list_potential_value = []
-
-	# 	for i in range(0, iterations):
-
-	# 		for row in range(matrix.shape[0]):
-	# 			for col in range(matrix.shape[1]):
-	# 				self.central_col = col
-	# 				self.central_row = row
-
-	# 				for distance_band in range(0,number_of_bands):
-	# 					for h in self.list_distance_bands:
-	# 						i = 0
-	# 						for potential_land_use in list_potential_land_use:
-	# 							i += 1
-	# 							if matrix[h] == tipo_suelo_potencial:
-	# 								Ihd = 1
-	# 							else:
-	# 								Ihd = 0
-
-	# 							for potencial_lista_ila... in range(0,100):
-
-	# 								suma = suma + (matrix_pesos[d][tipo_suelo_queremos][potencial_de_cada_tipo_suelo] * Ihd)
-
-	# 								list_potential_value.insert(i, perturbation * (1 + suma))
-
-	# 				max_potential = list_potential_value.max_index
-
-	# 				matrix[col][row] = max_potential
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	# # d = 
-
-	# for distance_band:
-	#   for h_cell_index:
-	#       for potential:
-
-
-	
-
-
-
-
 
 
 

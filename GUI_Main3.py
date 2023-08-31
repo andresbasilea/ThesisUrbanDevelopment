@@ -12,6 +12,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import pandas as pd
+import time
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -594,33 +595,38 @@ class App(customtkinter.CTk):
 
         try:
             if self.weights_matrix.any():
-                changed_state_matrix = utils.white_transition(self.matrix_array, self.weights_matrix)
-                print("\n\n\n##########\n\nchanged_state_matrix: ", changed_state_matrix)
+                
+                for iteration_num in range(int(self.slider_interactions.get())):
+                    changed_state_matrix = utils.white_transition(self.matrix_array, self.weights_matrix)
+                    
+                    print("\n\n\n##########\n\n","iteration: ", iteration_num+1,  "changed_state_matrix: ", changed_state_matrix)
 
-                for x in range(self.matrix_size):
-                    for y in range(self.matrix_size):
-                        #print(x,y,x+self.cell_size,y+self.cell_size)
-                        x1 = x*self.cell_size
-                        y1 = y*self.cell_size
-                        x2 = x1 + self.cell_size
-                        y2 = y1 + self.cell_size
-                        self.canvas.create_rectangle(x1,y1,x2,y2, fill=list(self.colors_mapping.keys())[list(self.colors_mapping.values()).index(int(changed_state_matrix[x][y]))], outline='black')
-                #self.update_percentage_values()
+                    for x in range(self.matrix_size):
+                        for y in range(self.matrix_size):
+                            #print(x,y,x+self.cell_size,y+self.cell_size)
+                            x1 = x*self.cell_size
+                            y1 = y*self.cell_size
+                            x2 = x1 + self.cell_size
+                            y2 = y1 + self.cell_size
+                            self.canvas.create_rectangle(x1,y1,x2,y2, fill=list(self.colors_mapping.keys())[list(self.colors_mapping.values()).index(int(changed_state_matrix[x][y]))], outline='black')
+                    #self.update_percentage_values()
 
 
-                self.ind_final_val = (np.count_nonzero(changed_state_matrix==1) / self.total_number_cells) *100
-                self.com_final_val = (np.count_nonzero(changed_state_matrix==2) / self.total_number_cells) *100
-                self.res_final_val = (np.count_nonzero(changed_state_matrix==3) / self.total_number_cells) *100
-                self.gre_final_val = (np.count_nonzero(changed_state_matrix==4) / self.total_number_cells) *100
-                self.vac_final_val = (np.count_nonzero(changed_state_matrix==5) / self.total_number_cells) *100
-                self.cell_perc_final_value = [self.ind_final_val, self.com_final_val, self.res_final_val, self.gre_final_val, self.vac_final_val]
+                    self.ind_final_val = (np.count_nonzero(changed_state_matrix==1) / self.total_number_cells) *100
+                    self.com_final_val = (np.count_nonzero(changed_state_matrix==2) / self.total_number_cells) *100
+                    self.res_final_val = (np.count_nonzero(changed_state_matrix==3) / self.total_number_cells) *100
+                    self.gre_final_val = (np.count_nonzero(changed_state_matrix==4) / self.total_number_cells) *100
+                    self.vac_final_val = (np.count_nonzero(changed_state_matrix==5) / self.total_number_cells) *100
+                    self.cell_perc_final_value = [self.ind_final_val, self.com_final_val, self.res_final_val, self.gre_final_val, self.vac_final_val]
 
-                for row in range(1,6):
-                    label_final = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.land_categories[row-1], fg_color="transparent")
-                    label_final.grid(row=row, column=4)
-                    label_final = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text= " " + str(self.cell_perc_final_value[row-1])[0:4] + "  ", fg_color="transparent")
-                    label_final.grid(row=row, column=5)
+                    for row in range(1,6):
+                        label_final = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text=self.land_categories[row-1], fg_color="transparent")
+                        label_final.grid(row=row, column=4)
+                        label_final = customtkinter.CTkLabel(self.tabview.tab("Cell %"), text= " " + str(self.cell_perc_final_value[row-1])[0:4] + "  ", fg_color="transparent")
+                        label_final.grid(row=row, column=5)
 
+                    # time.sleep(1)
+                    self.matrix_array = changed_state_matrix
         except Exception as error: print("Error (either missing weights file or something else): ", error)
 
         
