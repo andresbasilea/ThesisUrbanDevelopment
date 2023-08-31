@@ -24,6 +24,19 @@ class CA_Utils:
 		self.banda3 = [ [2,0 ], [0,-2], [-2,0 ], [0, 2]]
 		self.banda4 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]  
 		self.banda5 = [ [2, 2], [2, -2], [-2, -2], [-2, 2]]
+		self.banda6 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda7 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda8 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda9 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda10 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda11 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda12 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda13 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda14 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda15 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda16 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda17 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
+		self.banda18 = [ [2, 1], [2, -1], [1,2], [1, -2], [-2, 1], [-2, -1], [-1, 2], [-1, -2] ]
 
 
 		self.list_distance_bands = [ 
@@ -32,6 +45,20 @@ class CA_Utils:
 									self.banda3,
 									self.banda4,
 									self.banda5,
+									self.banda6,
+									self.banda7,
+									self.banda8,
+									self.banda9,
+									self.banda10,
+									self.banda11,
+									self.banda12,
+									self.banda13,
+									self.banda14,
+									self.banda15,
+									self.banda16,
+									self.banda17,
+									self.banda18
+
 									] 
 
 		self.ItoC = 0
@@ -60,13 +87,15 @@ class CA_Utils:
 		self.sum_XtoI = 0
 		self.sum_XtoH = 0
 		self.sum_XtoG = 0
+		self.sum_XtoV = 0
 
 		self.P_XtoC = 0
 		self.P_XtoI = 0
 		self.P_XtoH = 0
 		self.P_XtoG = 0
+		self.P_XtoV = 0
 		
-		self.list_potential_value = [self.P_XtoC, self.P_XtoI, self.P_XtoH, self.P_XtoG]
+		self.list_potential_value = [self.P_XtoC, self.P_XtoI, self.P_XtoH, self.P_XtoG, self.P_XtoV]
 
 		# self.sum_CtoC = 0
 		# self.sum_CtoI = 0
@@ -86,27 +115,27 @@ class CA_Utils:
 		# self.sum_VtoG = 0
 		# self.sum_VtoV = 0
 
-		self.potential_ItoC = 0
-		self.potential_ItoI = 0
-		self.potential_ItoH = 0
-		self.potential_ItoG = 0
-		self.potential_CtoC = 0
-		self.potential_CtoI = 0
-		self.potential_CtoH = 0
-		self.potential_CtoG = 0
-		self.potential_HtoC = 0
-		self.potential_HtoI = 0
-		self.potential_HtoH = 0
-		self.potential_HtoG = 0
-		self.potential_GtoC = 0
-		self.potential_GtoI = 0
-		self.potential_GtoH = 0
-		self.potential_GtoG = 0
-		self.potential_VtoC = 0
-		self.potential_VtoI = 0
-		self.potential_VtoH = 0
-		self.potential_VtoG = 0
-		self.potential_VtoV = 0
+		# self.potential_ItoC = 0
+		# self.potential_ItoI = 0
+		# self.potential_ItoH = 0
+		# self.potential_ItoG = 0
+		# self.potential_CtoC = 0
+		# self.potential_CtoI = 0
+		# self.potential_CtoH = 0
+		# self.potential_CtoG = 0
+		# self.potential_HtoC = 0
+		# self.potential_HtoI = 0
+		# self.potential_HtoH = 0
+		# self.potential_HtoG = 0
+		# self.potential_GtoC = 0
+		# self.potential_GtoI = 0
+		# self.potential_GtoH = 0
+		# self.potential_GtoG = 0
+		# self.potential_VtoC = 0
+		# self.potential_VtoI = 0
+		# self.potential_VtoH = 0
+		# self.potential_VtoG = 0
+		# self.potential_VtoV = 0
 
 		self.weights_range = 0
 
@@ -131,7 +160,7 @@ class CA_Utils:
 		#Ihd = 1
 		#sum_result = 0
 		
-		number_of_bands = 5
+		#number_of_bands = 18
 
 
 		# sum_result_ItoSomething = 0
@@ -147,10 +176,12 @@ class CA_Utils:
 				self.P_XtoI = 0
 				self.P_XtoH = 0
 				self.P_XtoG = 0
+				self.P_XtoV = 0
 				self.sum_XtoC = 0 
 				self.sum_XtoI = 0
 				self.sum_XtoH = 0
 				self.sum_XtoG = 0
+				self.sum_XtoV = 0
 
 				self.central_col = col
 				self.central_row = row
@@ -160,22 +191,22 @@ class CA_Utils:
 
 
 
-				if self.central_land_use == 0: # i cell (central cell) is vacant 
-					self.weights_range = 94
+				if self.central_land_use == 5: # i cell (central cell) is vacant 
+					self.weights_range = 80
 				if self.central_land_use == 1: # i cell (central cell) is Industrial 
 					self.weights_range = 0
 				if self.central_land_use == 2: # i cell (central cell) is Commercial
-					self.weights_range = 24
+					self.weights_range = 20
 				if self.central_land_use == 3: # i cell (central cell) is Residential
-					self.weights_range = 48
+					self.weights_range = 40
 				if self.central_land_use == 4: # i cell (central cell) is Green
-					self.weights_range = 72
+					self.weights_range = 60
 
-
+				# TODO: CHECK VACANT TRANSITION
 
 				distance_band_num = 0
 				for distance_band in self.list_distance_bands:
-					distance_band_num += 1
+					
 					
 
 					for h in distance_band:
@@ -191,38 +222,80 @@ class CA_Utils:
 							break 
 						#print("new_row: ", new_row, "new_col: ", new_col, "h_land_use: ", h_land_use)
 
+
+
+						if self.central_land_use == 5:
+
+							if h_land_use == 5:
+								self.sum_XtoV += weights[self.weights_range + 4][distance_band_num]
+								self.sum_XtoC += weights[self.weights_range + 9][distance_band_num]
+								self.sum_XtoI += weights[self.weights_range + 14][distance_band_num]
+								self.sum_XtoH += weights[self.weights_range + 19][distance_band_num]
+								self.sum_XtoG += weights[self.weights_range + 24][distance_band_num]
+
+							if h_land_use == 1:
+								self.sum_XtoV += weights[self.weights_range + 1][distance_band_num]
+								self.sum_XtoC += weights[self.weights_range + 6][distance_band_num]
+								self.sum_XtoI += weights[self.weights_range + 11][distance_band_num]
+								self.sum_XtoH += weights[self.weights_range + 16][distance_band_num]
+								self.sum_XtoG += weights[self.weights_range + 21][distance_band_num]
+
+							if h_land_use == 2:
+								self.sum_XtoV += weights[self.weights_range + 0][distance_band_num]
+								self.sum_XtoC += weights[self.weights_range + 5][distance_band_num]
+								self.sum_XtoI += weights[self.weights_range + 10][distance_band_num]
+								self.sum_XtoH += weights[self.weights_range + 15][distance_band_num]
+								self.sum_XtoG += weights[self.weights_range + 20][distance_band_num]
+
+							if h_land_use == 3:
+								self.sum_XtoV += weights[self.weights_range + 2][distance_band_num]
+								self.sum_XtoC += weights[self.weights_range + 7][distance_band_num]
+								self.sum_XtoI += weights[self.weights_range + 12][distance_band_num]
+								self.sum_XtoH += weights[self.weights_range + 17][distance_band_num]
+								self.sum_XtoG += weights[self.weights_range + 22][distance_band_num]
+
+							if h_land_use == 4:
+								self.sum_XtoV += weights[self.weights_range + 3][distance_band_num]
+								self.sum_XtoC += weights[self.weights_range + 8][distance_band_num]
+								self.sum_XtoI += weights[self.weights_range + 13][distance_band_num]
+								self.sum_XtoH += weights[self.weights_range + 18][distance_band_num]
+								self.sum_XtoG += weights[self.weights_range + 23][distance_band_num]
 						
-						if h_land_use == 0:
-							self.sum_XtoC += weights[self.weights_range + 5][distance_band_num]
-							self.sum_XtoI += weights[self.weights_range + 11][distance_band_num]
-							self.sum_XtoH += weights[self.weights_range + 17][distance_band_num]
-							self.sum_XtoG += weights[self.weights_range + 23][distance_band_num]
 
-						if h_land_use == 1:
-							self.sum_XtoC += weights[self.weights_range + 2][distance_band_num]
-							self.sum_XtoI += weights[self.weights_range + 8][distance_band_num]
-							self.sum_XtoH += weights[self.weights_range + 14][distance_band_num]
-							self.sum_XtoG += weights[self.weights_range + 20][distance_band_num]
-						
-						if h_land_use == 2:
-							self.sum_XtoC += weights[self.weights_range + 1][distance_band_num]
-							self.sum_XtoI += weights[self.weights_range + 6][distance_band_num]
-							self.sum_XtoH += weights[self.weights_range + 12][distance_band_num]
-							self.sum_XtoG += weights[self.weights_range + 18][distance_band_num]
+						else:
+					
+							if h_land_use == 5:
+								#self.sum_XtoV += weights[self.weights_range + 5][distance_band_num]
+								self.sum_XtoC += weights[self.weights_range + 4][distance_band_num]
+								self.sum_XtoI += weights[self.weights_range + 9][distance_band_num]
+								self.sum_XtoH += weights[self.weights_range + 14][distance_band_num]
+								self.sum_XtoG += weights[self.weights_range + 19][distance_band_num]
 
-						if h_land_use == 3:
-							self.sum_XtoC += weights[self.weights_range + 3][distance_band_num]
-							self.sum_XtoI += weights[self.weights_range + 9][distance_band_num]
-							self.sum_XtoH += weights[self.weights_range + 15][distance_band_num]
-							self.sum_XtoG += weights[self.weights_range + 21][distance_band_num]
+							if h_land_use == 1:
+								self.sum_XtoC += weights[self.weights_range + 1][distance_band_num]
+								self.sum_XtoI += weights[self.weights_range + 6][distance_band_num]
+								self.sum_XtoH += weights[self.weights_range + 11][distance_band_num]
+								self.sum_XtoG += weights[self.weights_range + 16][distance_band_num]
+							
+							if h_land_use == 2:
+								self.sum_XtoC += weights[self.weights_range + 0][distance_band_num]
+								self.sum_XtoI += weights[self.weights_range + 5][distance_band_num]
+								self.sum_XtoH += weights[self.weights_range + 10][distance_band_num]
+								self.sum_XtoG += weights[self.weights_range + 15][distance_band_num]
 
-						if h_land_use == 4:
-							self.sum_XtoC += weights[self.weights_range + 4][distance_band_num]
-							self.sum_XtoI += weights[self.weights_range + 10][distance_band_num]
-							self.sum_XtoH += weights[self.weights_range + 16][distance_band_num]
-							self.sum_XtoG += weights[self.weights_range + 22][distance_band_num]	
+							if h_land_use == 3:
+								self.sum_XtoC += weights[self.weights_range + 2][distance_band_num]
+								self.sum_XtoI += weights[self.weights_range + 7][distance_band_num]
+								self.sum_XtoH += weights[self.weights_range + 12][distance_band_num]
+								self.sum_XtoG += weights[self.weights_range + 17][distance_band_num]
 
-				
+							if h_land_use == 4:
+								self.sum_XtoC += weights[self.weights_range + 3][distance_band_num]
+								self.sum_XtoI += weights[self.weights_range + 8][distance_band_num]
+								self.sum_XtoH += weights[self.weights_range + 13][distance_band_num]
+								self.sum_XtoG += weights[self.weights_range + 18][distance_band_num]	
+
+					distance_band_num += 1
 				#self.max_potential = 
 				#for potential_value in self.list_potential_value:
 
@@ -230,7 +303,8 @@ class CA_Utils:
 				self.P_XtoI = self.stochastic_disturbance * (1 + self.sum_XtoI)
 				self.P_XtoH = self.stochastic_disturbance * (1 + self.sum_XtoH)
 				self.P_XtoG = self.stochastic_disturbance * (1 + self.sum_XtoG)
-				self.list_potential_value = [self.P_XtoC, self.P_XtoI, self.P_XtoH, self.P_XtoG]
+				self.P_XtoV = self.stochastic_disturbance * (1 + self.sum_XtoV)
+				self.list_potential_value = [self.P_XtoC, self.P_XtoI, self.P_XtoH, self.P_XtoG, self.P_XtoV]
 
 				print("list_potential_value: ", self.list_potential_value)
 				max_index = self.list_potential_value.index(max(self.list_potential_value))

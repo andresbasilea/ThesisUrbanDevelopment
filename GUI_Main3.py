@@ -13,6 +13,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import pandas as pd
 import time
+import traceback
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -137,10 +138,11 @@ class App(customtkinter.CTk):
         self.interactions_parameter = customtkinter.CTkLabel(self.tabview.tab("Parameters"), text="Number of Interactions: " + self.slider_interactions_value , fg_color="transparent")
         self.interactions_parameter.grid(row=0, column=0)
 
-        self.slider_perturbation = customtkinter.CTkSlider(self.tabview.tab("Parameters"), from_=0, to=1, number_of_steps=100, command=self.set_label_parameter_perturbation)
+        self.slider_perturbation = customtkinter.CTkSlider(self.tabview.tab("Parameters"), from_=0, to=5, number_of_steps=100,state='disabled', command=self.set_label_parameter_perturbation)
         self.slider_perturbation.grid(row=3, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
         self.slider_perturbation_value = str(self.slider_perturbation.get())
         self.perturbation_parameter = customtkinter.CTkLabel(self.tabview.tab("Parameters"), text="Perturbation: " + self.slider_perturbation_value, fg_color="transparent")
+        self.slider_perturbation.set(2.5)
         self.perturbation_parameter.grid(row=2, column=0)
 
         self.slider_radius = customtkinter.CTkSlider(self.tabview.tab("Parameters"), from_=1, to=10, number_of_steps=10, state='disabled', command=self.set_label_parameter_radius)
@@ -627,7 +629,7 @@ class App(customtkinter.CTk):
 
                     # time.sleep(1)
                     self.matrix_array = changed_state_matrix
-        except Exception as error: print("Error (either missing weights file or something else): ", error)
+        except Exception as error: print("Error (either missing weights file or something else): ", error, "\n\n", traceback.format_exc())
 
         
 
@@ -647,6 +649,7 @@ class App(customtkinter.CTk):
 
             weights_file_np = weights_file.to_numpy()
             print(weights_file_np)
+            print(weights_file_np.shape)
             self.weights_matrix = weights_file_np
 
 
