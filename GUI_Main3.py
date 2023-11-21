@@ -25,7 +25,7 @@ class App(customtkinter.CTk):
 
         # configure window
         self.title("Tesis Ila")
-        self.geometry(f"{1600}x{900}")
+        self.geometry(f"{1700}x{1100}")
 
         # configure grid layout (4x4)
         self.grid_columnconfigure(0, weight=1)
@@ -134,6 +134,7 @@ class App(customtkinter.CTk):
 
         self.slider_interactions = customtkinter.CTkSlider(self.tabview.tab("Parameters"), from_=1, to=40, number_of_steps=39, command=self.set_label_parameter_interactions)
         self.slider_interactions.grid(row=1, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
+        self.slider_interactions.set(5)
         self.slider_interactions_value = str(int(self.slider_interactions.get()))
         self.interactions_parameter = customtkinter.CTkLabel(self.tabview.tab("Parameters"), text="Number of Interactions: " + self.slider_interactions_value , fg_color="transparent")
         self.interactions_parameter.grid(row=0, column=0)
@@ -151,79 +152,6 @@ class App(customtkinter.CTk):
         self.slider_radius_value = str(int(self.slider_radius.get()))
         self.radius_parameter = customtkinter.CTkLabel(self.tabview.tab("Parameters"), text="Moore Neighborhood (Radius): " + self.slider_radius_value, fg_color="transparent")
         self.radius_parameter.grid(row=4, column=0)
-
-
-
-        # WEIGHTS
-
-        #self.weights_file = read_weights.read_excel_weights("pesos.xlsx")
-
-        # self.tabview.tab("Weights").grid_columnconfigure(0, weight=1)
-        # self.root = self.tabview.tab("Weights")
-        # self.table_rows = 127
-        # self.table_columns = 19
-        # self.column_headings = [ 
-        #     "1", "1.4", "2", "2.2", "2.8", "3", "3.2", "3.6", "4", "4.1", 
-        #     "4.2", "4.5", "5", "5.1", "5.4", "5.7", "5.8", "6.0", "6.1-8"
-        # ]
-        # self.row_headings = [ "A-A",
-
-        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
-        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
-        #     "A-C", "A-I", "A-R", "A-A",
-
-        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
-        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
-        #     "A-C", "A-I", "A-R", "A-A",
-
-        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
-        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
-        #     "A-C", "A-I", "A-R", "A-A",
-
-        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
-        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
-        #     "A-C", "A-I", "A-R", "A-A",
-
-        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
-        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
-        #     "A-C", "A-I", "A-R", "A-A",
-
-        #     "V-C", "V-I", "V-R", "V-G", "V-V", "I-C", "I-I", "I-R", "I-G", 
-        #     "C-C", "C-I", "C-R", "C-G", "R-C", "R-I", "R-R", "R-G", 
-        #     "A-C", "A-I", "A-R", "A-A"
-        # ]
-
-        # self.table_data = np.zeros((self.table_rows, self.table_columns), dtype=int)
-
-        # my_file = Path("weights_file.npy")
-        # if my_file.is_file():
-        #     self.table_data = np.load("weights_file.npy")
-
-        # self.table_frame = customtkinter.CTkScrollableFrame(self.root)
-        # #self.table_frame.grid(column=0, columnspan=30)
-        # self.entry_widgets = []
-
-        # for i, row_heading in enumerate(self.row_headings):
-        #     row_label = customtkinter.CTkLabel(self.table_frame, text=row_heading, width=3, anchor="w") # faster to load with tkinter than customtkinter
-        #     row_label.grid(row=i+2, column=0)
-            
-        #     row_entries = []
-        #     for j, col_heading in enumerate(self.column_headings):
-        #         if i == 0:  # Add column headings to the first row
-        #             col_label = customtkinter.CTkLabel(self.table_frame, text=col_heading, width=3) # faster to load with tkinter than customtkinter
-        #             col_label.grid(row=1, column=j+1)
-                
-        #         entry = tkinter.Entry(self.table_frame, width=2)  # faster to load with tkinter than customtkinter
-        #         entry.insert(-1, self.table_data[i,j])
-        #         entry.grid(row=i+2, column=j+1)
-        #         row_entries.append(entry)
-        #     self.entry_widgets.append(row_entries)
-
-        # self.save_button = customtkinter.CTkButton(self.root, text="Save", command=self.save_table_data)
-        # self.save_button.grid(row=50, column=0)
-
-        # self.table_frame.grid()
-
 
 
 
@@ -254,12 +182,12 @@ class App(customtkinter.CTk):
 
 
         # configure canvas for raster creation or upload
-        self.canvas_width = 700
+        self.canvas_width = 600
         self.canvas = tkinter.Canvas(self, width=self.canvas_width, height=self.canvas_width, bg='white')
         self.canvas.grid(row=0, column=5, rowspan=3)
         #self.colors = ["#2C3333", "#1D267D", "#5C469C", "#0E8388", "#CBE4DE"]
-        self.colors = ['rebeccapurple', 'crimson', 'darkorange', 'darkcyan','black']
-        self.colors_mapping = {'white':0,'rebeccapurple':1, 'crimson':2, 'darkorange':3,'darkcyan':4,'black':5}
+        self.colors = ['purple', 'red', 'darkorange', 'darkcyan','black']
+        self.colors_mapping = {'white':0,'purple':1, 'red':2, 'darkorange':3,'darkcyan':4,'black':5}
         self.selected_color = self.colors[0]
         self.draw_options_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color='transparent')
         self.draw_options_frame.grid(row=3, column=5)
@@ -580,7 +508,7 @@ class App(customtkinter.CTk):
                 except ValueError:
                     pass
 
-        print("Saved data to NumPy array:\n", self.table_data)
+        #print("Saved data to NumPy array:\n", self.table_data)
 
         with open('table_data.npy','wb') as f:
             np.save(f, self.table_data)
@@ -601,7 +529,8 @@ class App(customtkinter.CTk):
                 for iteration_num in range(int(self.slider_interactions.get())):
                     changed_state_matrix = utils.white_transition(self.matrix_array, self.weights_matrix)
                     
-                    print("\n\n\n##########\n\n","iteration: ", iteration_num+1,  "changed_state_matrix: ", changed_state_matrix)
+                    print("\n\n\n##########\n\n","iteration: ", iteration_num+1)
+                    #,  "changed_state_matrix: ", changed_state_matrix)
 
                     for x in range(self.matrix_size):
                         for y in range(self.matrix_size):
@@ -642,14 +571,14 @@ class App(customtkinter.CTk):
         if filename:
             weights_file = pd.read_excel(filename)
 
-            print(weights_file)
+            #print(weights_file)
 
             weights_file = weights_file.dropna()
             weights_file.drop(columns=weights_file.columns[0], axis=1, inplace=True)
 
             weights_file_np = weights_file.to_numpy()
-            print(weights_file_np)
-            print(weights_file_np.shape)
+            #print(weights_file_np)
+            #print(weights_file_np.shape)
             self.weights_matrix = weights_file_np
 
 
