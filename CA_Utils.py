@@ -330,7 +330,7 @@ class CA_Utils:
 				self.P_XtoH = self.stochastic_disturbance_1 * (1 + self.sum_XtoH)
 				self.P_XtoG = self.stochastic_disturbance_1 * (1 + self.sum_XtoG)
 				self.P_XtoV = self.stochastic_disturbance_1 * (1 + self.sum_XtoV)
-				self.list_potential_value = [self.P_XtoC, self.P_XtoI, self.P_XtoH, self.P_XtoG, self.P_XtoV]
+				self.list_potential_value = [self.P_XtoI, self.P_XtoC, self.P_XtoH, self.P_XtoG, self.P_XtoV]
 
 				#print("list_potential_value: ", self.list_potential_value)
 
